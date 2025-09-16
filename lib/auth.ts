@@ -3,12 +3,23 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 
+import { supabase } from "./supabase"
+
 // This would typically connect to your database
 // For now, we'll use a mock function
 async function getUserByEmail(email: string) {
-  // TODO: Replace with actual database query
-  // This is a mock implementation
-  return null
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single()
+
+  if (error) {
+    console.error("Error fetching user:", error)
+    return null
+  }
+
+  return user
 }
 
 async function verifyPassword(password: string, hashedPassword: string) {
